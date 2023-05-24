@@ -2,11 +2,18 @@ import discord
 from discord.ext import commands
 import os
 from dotenv import load_dotenv
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 
 load_dotenv()
 token1 = os.getenv('DISCORD_TOKEN')
+client_id = os.getenv('CLIENT_ID')
+client_secret = os.getenv('CLIENT_SECRET')
+redirect_uri = os.getenv('REDIRECT_URI')
 
+scope = 'user-modify-playback-state'  # Specify the required scope(s) for controlling playback
 
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri, scope=scope))
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -34,17 +41,12 @@ async def on_message(message):
 
 @client.event
 async def on_voice_state_update(member, before, after):
-    # print(member)
-    # print(before)
-    # print(after)
-    # print(after.channel)
 
-    # if after.channel is not None:
-    #         print('hi')
-    #         await member.guild.system_channel.send(f"{member.display_name} has joined {after.channel.name}")
     if after.channel is not None and str(member) == "Nekotina#0608":
         print('nekotina has joined')
+        sp.pause_playback()
     else:
+        sp.start_playback()
         print('nekotina has left')
 
 
